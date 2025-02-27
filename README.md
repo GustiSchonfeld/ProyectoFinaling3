@@ -21,4 +21,8 @@ Backend:
 
 •	Express.js: Para manejar las rutas y la API.
 
+<<<<<<< HEAD
 •	SQLite: Como base de datos ligera para almacenar los contactos.
+=======
+•	SQLite: Como base de datos ligera para almacenar los contactos.
+>>>>>>> 1f8ffb41b487a38cc9fa85656df637b9b6ceced2

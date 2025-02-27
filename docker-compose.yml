@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile  # Especificamos que el Dockerfile está en la carpeta frontend
+    ports:
+      - "3000:80"  
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile  # Especificamos que el Dockerfile está en la carpeta backend
+    ports:
+      - "5000:5000"  # Puerto del backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -31,7 +31,7 @@ jobs:
         run: docker logout
         if: always()
 
-    test_docker_compose:
+  test_docker_compose:
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:

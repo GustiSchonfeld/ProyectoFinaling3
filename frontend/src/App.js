@@ -8,7 +8,7 @@ function App() {
 
   const fetchContacts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/contactos');
+      const response = await axios.get('https://gc-backend-897250120630.us-central1.run.app/contactos');
       setContactos(response.data);
     } catch (error) {
       console.error('Error al obtener los contactos:', error);

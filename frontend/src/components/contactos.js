@@ -8,11 +8,11 @@ const Contactos = () => {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/contactos").then((res) => setContactos(res.data));
+    axios.get("https://gc-backend-897250120630.us-central1.run.app/api/contactos").then((res) => setContactos(res.data));
   }, []);
 
   const agregarContacto = () => {
-    axios.post("http://localhost:5000/api/contactos", { nombre, telefono, email }).then(() => {
+    axios.post("https://gc-backend-897250120630.us-central1.run.app/api/contactos", { nombre, telefono, email }).then(() => {
       setContactos([...contactos, { nombre, telefono, email }]);
       setNombre("");
       setTelefono("");
@@ -21,7 +21,7 @@ const Contactos = () => {
   };
 
   const eliminarContacto = (id) => {
-    axios.delete(`http://localhost:5000/api/contactos/${id}`).then(() => {
+    axios.delete(`https://gc-backend-897250120630.us-central1.run.app/api/contactos/${id}`).then(() => {
       setContactos(contactos.filter((contacto) => contacto._id !== id));
     });
   };

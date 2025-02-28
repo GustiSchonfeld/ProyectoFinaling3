@@ -1,7 +1,7 @@
 Feature('agendadecontactos');
 
 Scenario('Crear nuevo contacto', ({ I }) => {
-  I.amOnPage('http://localhost:3000/');
+  I.amOnPage('https://gc-frontend-897250120630.us-central1.run.app/');
     I.saveScreenshot('1-inicio.png');
 
     I.click('Mostrar Agenda de Contactos');

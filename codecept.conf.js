@@ -13,7 +13,7 @@ exports.config = {
   helpers: {
     Playwright: {
       browser: 'chromium',
-      url: 'http://localhost:3000/',
+      url: 'https://gc-frontend-897250120630.us-central1.run.app/',
       show: true
     }
   },

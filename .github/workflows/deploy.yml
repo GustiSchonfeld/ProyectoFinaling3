@@ -17,7 +17,7 @@ jobs:
         run: |
            docker compose up -d
            sleep 10
-      
+
       - name: Run frontend
         run: |
           npm install --force

@@ -17,7 +17,7 @@ function AddContact() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/contactos', {
+      const response = await fetch('https://gc-backend-897250120630.us-central1.run.app/contactos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

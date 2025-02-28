@@ -5,6 +5,7 @@ const app = express();
 app.use(cors()); // Habilita CORS
 app.use(express.json()); // Middleware para manejar JSON
 
+
 // Ruta principal
 app.get('/', (req, res) => {
   res.send('API de Agenda de Contactos');
@@ -37,6 +38,21 @@ app.get('/contactos', (req, res) => {
     res.json(rows);
   });
 });
+
+// Ruta para eliminar un contacto
+app.delete('/contactos/:id', (req, res) => {
+  const { id } = req.params;
+  db.run('DELETE FROM contactos WHERE id = ?', [id], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ message: "Contacto eliminado correctamente" });
+    }
+  });
+});
+
+// Exporta la aplicación para las pruebas
+module.exports = app;
 
 // Iniciar el servidor
 app.listen(5000, () => {

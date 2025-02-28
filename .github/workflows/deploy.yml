@@ -22,14 +22,13 @@ jobs:
 
       - name: Subir imágenes a DockerHub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          cd backend
+          docker build -t  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest .
+          docker push  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          cd ../frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
-          
-      - name: Iniciar Docker Compose y probar
-        run: |
-          docker-compose up --build
-          sleep 10  # Esperar a que los servicios arranquen
-          docker ps  # Verificar que los contenedores están corriendo
 
-      - name: Parar y limpiar los contenedores
-        run: docker-compose down
+      - name: Cerrar sesión en DockerHub
+        run: docker logout
+        if: always()

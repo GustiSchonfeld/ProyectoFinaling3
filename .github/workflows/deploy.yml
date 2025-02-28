@@ -6,50 +6,34 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout del código
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Construir imágenes Docker
+      - name: Build and run 
         run: |
+           docker compose up -d
+           sleep 10
+      
+      - name: Run frontend
+        run: |
+          npm install --force
+          nohup npm start &
+        working-directory: ./frontend
+
+      - name: Build and push images
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |-
+          echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
           cd backend
-          docker build -t  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest .
+          docker build -t $DOCKERHUB_USERNAME/backend:latest .
+          docker push $DOCKERHUB_USERNAME/backend:latest
           cd ../frontend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest .
-
-      - name: Iniciar sesión en DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Subir imágenes a DockerHub
-        run: |
-          docker push  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
-
-      - name: Cerrar sesión en DockerHub
-        run: docker logout
-        if: always()
-
-  test_docker_compose:
-    needs: build_and_push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v2
-
-      - name: Instalar Docker Compose
-        run: sudo apt-get update && sudo apt-get install -y docker-compose
-
-      - name: Descargar imágenes desde DockerHub
-        run: |
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
-
-      - name: Iniciar contenedores con Docker Compose
-        run: |
-          docker-compose up -d
-          sleep 10  # Esperar a que los servicios arranquen
-
-      - name: Parar y limpiar los contenedores
-        run: docker-compose down
+          docker build -t $DOCKERHUB_USERNAME/frontend:latest .
+          docker push $DOCKERHUB_USERNAME/frontend:latest
+          

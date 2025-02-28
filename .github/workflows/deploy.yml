@@ -15,7 +15,7 @@ jobs:
 
       - name: Build and run 
         run: |
-           docker compose up -d
+           docker-compose up --build
            sleep 10
 
       - name: Run frontend

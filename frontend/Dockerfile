@@ -12,9 +12,10 @@ RUN npm install
 # Construir la aplicación React
 RUN npm run build
 
-# Etapa 2: Servir la aplicación con Nginx
-FROM nginx:alpine
+# Copiar configuración personalizada de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copiar los archivos construidos al contenedor de Nginx
-COPY --from=build /app/frontend/build /usr/share/nginx/html
+# Exponer el puerto correcto
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]
 

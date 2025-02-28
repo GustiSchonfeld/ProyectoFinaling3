@@ -51,13 +51,5 @@ jobs:
           docker-compose up -d
           sleep 10  # Esperar a que los servicios arranquen
 
-      - name: Verificar que los contenedores están corriendo
-        run: docker ps
-
-      - name: Verificar que SQLite funciona en el backend
-        run: |
-          docker exec $(docker ps -q -f "name=backend") ls /app/data
-          docker exec $(docker ps -q -f "name=backend") cat /app/data/database.sqlite || echo "La DB aún no existe"
-
       - name: Parar y limpiar los contenedores
         run: docker-compose down

@@ -1,0 +1,46 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Construir imágenes Docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest ./backend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest ./frontend
+
+      - name: Iniciar sesión en DockerHub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Subir imágenes a DockerHub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+
+      - name: Cerrar sesión en DockerHub
+        run: docker logout
+        if: always()
+
+  test_docker_compose:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Iniciar Docker Compose y probar
+        run: |
+          docker-compose up -d
+          sleep 10  # Esperar a que los servicios arranquen
+          docker ps  # Verificar que los contenedores están corriendo
+
+      - name: Parar y limpiar los contenedores
+        run: docker-compose down

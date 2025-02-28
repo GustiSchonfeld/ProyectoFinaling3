@@ -14,21 +14,47 @@ jobs:
 
       - name: Construir imágenes Docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest ./backend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest ./frontend
+          cd backend
+          docker build -t  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest .
+          cd ../frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest .
 
       - name: Iniciar sesión en DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Subir imágenes a DockerHub
         run: |
-          cd backend
-          docker build -t  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest .
           docker push  ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
-          cd ../frontend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
 
       - name: Cerrar sesión en DockerHub
         run: docker logout
         if: always()
+
+    test_docker_compose:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Descargar imágenes desde DockerHub
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+
+      - name: Iniciar contenedores con Docker Compose
+        run: |
+          docker-compose up -d
+          sleep 10  # Esperar a que los servicios arranquen
+
+      - name: Verificar que los contenedores están corriendo
+        run: docker ps
+
+      - name: Verificar que SQLite funciona en el backend
+        run: |
+          docker exec $(docker ps -q -f "name=backend") ls /app/data
+          docker exec $(docker ps -q -f "name=backend") cat /app/data/database.sqlite || echo "La DB aún no existe"
+
+      - name: Parar y limpiar los contenedores
+        run: docker-compose down

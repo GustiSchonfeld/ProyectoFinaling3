@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ "prueba" ]
 
 jobs:
   build:
@@ -17,9 +17,15 @@ jobs:
         run: |
            docker compose up -d
            sleep 10
-      
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test  # Ejecuta las pruebas del backend
+
       - name: Run frontend
         run: |
+          cd frontend
           npm install --force
           nohup npm start &
         working-directory: ./frontend

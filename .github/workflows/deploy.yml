@@ -38,7 +38,7 @@ jobs:
 
       - name: Iniciar Docker Compose y probar
         run: |
-          docker-compose up -d
+          docker-compose up --build
           sleep 10  # Esperar a que los servicios arranquen
           docker ps  # Verificar que los contenedores están corriendo
 

@@ -13,11 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+
+      - name: Install dependencies (backend)
+        run: |
+          cd backend
+          npm install --force  # Asegura que las dependencias del backend estén instaladas
+
+      - name: Install dependencies (frontend)
+        run: |
+          cd frontend
+          npm install --force  # Asegura que las dependencias del frontend estén instaladas
+
       - name: Build and run 
         run: |
-           docker compose up -d
-           sleep 10
-
+          docker compose up -d
+          sleep 10
+      
       - name: Run backend tests
         run: |
           cd backend
@@ -26,7 +37,6 @@ jobs:
       - name: Run frontend
         run: |
           cd frontend
-          npm install --force
           nohup npm start &
         working-directory: ./frontend
 

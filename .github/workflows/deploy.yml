@@ -36,4 +36,48 @@ jobs:
           cd ../frontend
           docker build -t $DOCKERHUB_USERNAME/frontend:latest .
           docker push $DOCKERHUB_USERNAME/frontend:latest
-          
+
+  deploy-googleCloud:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: ${{ secrets.GOOGLECLOUD_PROJECT }}
+      REGION: us-central1
+
+    steps:
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials: ${{ secrets.GOOGLECLOUD_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Push the image to the Google Container Registry (GCR)
+        run: |-
+          docker pull gustavoschonfeld14/frontend
+          docker pull gustavoschonfeld14/backend
+          docker tag gustavoschonfeld14/frontend gcr.io/gustiinge3/gc-frontend:latest
+          docker tag gustavoschonfeld14/backend gcr.io/gustiinge3/gc-backend:latest
+          docker push gcr.io/gustiinge3/gc-frontend:latest
+          docker push gcr.io/gustiinge3/gc-backend:latest
+
+      - name: Deploy Frontend
+        run: |-
+          gcloud run deploy gc-frontend \
+          --region $REGION \
+          --image gcr.io/gustiinge3/gc-frontend:latest \
+          --platform "managed" \
+          --quiet
+      
+      - name: Deploy Backend
+        run: |-
+          gcloud run deploy gc-backend \
+          --region $REGION \
+          --image gcr.io/gustiinge3/gc-backend:latest \
+          --platform "managed" \
+          --quiet    
